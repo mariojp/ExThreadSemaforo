@@ -25,6 +25,9 @@ public class Cenario3 {
     Semaforo semaforo3 = new Semaforo(3);
 
     public Cenario3() {
+    	semaforo1.setSemaforoAnterior(semaforo2);
+    	semaforo2.setSemaforoAnterior(semaforo3);
+    	semaforo3.setSemaforoAnterior(semaforo1);
         List<Semaforo> semaforos = new ArrayList<Semaforo>();
         semaforos.add(semaforo1);
         semaforos.add(semaforo2);

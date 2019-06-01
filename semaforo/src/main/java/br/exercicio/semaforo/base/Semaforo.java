@@ -1,7 +1,10 @@
 package br.exercicio.semaforo.base;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+
+import javax.swing.JPanel;
 
 /**
  * Representa o Semaforo
@@ -15,7 +18,9 @@ public class Semaforo extends JPanel implements Runnable {
     public static final Color VERDE = Color.green;
 
 
+    private Semaforo semaforoAnterior;
     public int luz = 1;
+    private Boolean isInit = false;
 
     private Luz luz1 = new Luz(null);
     private Luz luz2 = new Luz(null);
@@ -50,7 +55,7 @@ public class Semaforo extends JPanel implements Runnable {
     }
 
     public void mudaCor(){
-
+    	
         switch (luz){
             case 1 :
                 luz1.setCor(null);
@@ -66,35 +71,64 @@ public class Semaforo extends JPanel implements Runnable {
                 break;
             case 3 :
             default:
+            
                 luz1.setCor(VERMELHO);
                 luz2.setCor(null);
                 luz3.setCor(null);
                 this.luz = 1;
                 break;
         }
+        
     }
 
     public void run() {
         while(true){
-            this.mudaCor();
-            try {
-                switch (luz){
-                    case 1 :
-                        Thread.sleep(6000);
-                        break;
-                    case 2 :
-                        Thread.sleep(9000);
-                        break;
-                    case 3 :
-                        Thread.sleep(3000);
-                        break;
-
-
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        	if(semaforoAnterior != null) {
+	        	synchronized (semaforoAnterior) {
+	        		if( luz == 1 && semaforoAnterior.luz == 2) {
+		    			semaforoAnterior.notifyAll();
+		    			
+		    		}
+				}
+        	}
+        	this.mudaCor();
+        	synchronized(this) {
+	    		
+	    		
+	    		try {
+	            	
+	    			if(semaforoAnterior != null && luz == 2 && semaforoAnterior.luz != 1) {
+	    				
+	    				wait();
+	    			} 
+	    			
+	    		} catch (InterruptedException e) {
+	    		}
+	    	
+	            try {
+	                switch (luz){
+	                    case 1 :
+	                        Thread.sleep(2000);
+	                        break;
+	                    case 2 :
+	                        Thread.sleep(2000);
+	                        break;
+	                    case 3 :
+	                        Thread.sleep(2000);
+	                        break;
+	
+	
+	                }
+	            } catch (InterruptedException e) {
+	                e.printStackTrace();
+	            }
+	            
+	        }
         }
+    }
+    
+    public void setSemaforoAnterior(Semaforo semaforo) {
+    	this.semaforoAnterior = semaforo;
     }
 
 }
